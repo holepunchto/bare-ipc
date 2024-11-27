@@ -9,14 +9,11 @@ test('basic', (t) => {
   const a = ports[0].connect()
   const b = ports[1].connect()
 
-  a
-    .on('close', () => t.pass('a closed'))
+  a.on('close', () => t.pass('a closed'))
     .on('data', (data) => t.alike(data, Buffer.from('hello a')))
+    .end('hello b')
 
-  b
-    .on('close', () => t.pass('b closed'))
+  b.on('close', () => t.pass('b closed'))
     .on('data', (data) => t.alike(data, Buffer.from('hello b')))
-
-  a.end('hello b')
-  b.end('hello a')
+    .end('hello a')
 })
