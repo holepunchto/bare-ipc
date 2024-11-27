@@ -1,6 +1,6 @@
 {
   "name": "bare-ipc",
-  "version": "1.0.0",
+  "version": "1.0.1",
   "description": "Lightweight pipe-based IPC for Bare",
   "exports": {
     ".": "./index.js",
