@@ -3,12 +3,19 @@
   "version": "1.0.1",
   "description": "Lightweight pipe-based IPC for Bare",
   "exports": {
-    ".": "./index.js",
+    ".": {
+      "types": "./index.d.ts",
+      "default": "./index.js"
+    },
     "./package": "./package.json",
-    "./errors": "./lib/errors.js"
+    "./errors": {
+      "types": "./lib/errors.d.ts",
+      "default": "./lib/errors.js"
+    }
   },
   "files": [
     "index.js",
+    "index.d.ts",
     "lib"
   ],
   "scripts": {
