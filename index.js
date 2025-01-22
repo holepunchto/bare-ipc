@@ -1,5 +1,6 @@
 const Pipe = require('bare-pipe')
 const { Duplex } = require('bare-stream')
+const { symbols } = require('bare-structured-clone')
 const errors = require('./lib/errors')
 
 module.exports = exports = class IPC extends Duplex {
@@ -61,7 +62,7 @@ class IPCPort {
     return ipc
   }
 
-  [Symbol.for('bare.detach')]() {
+  [symbols.detach]() {
     if (this.detached) {
       throw errors.ALREADY_CONNECTED(
         'Port has already started receiving messages'
@@ -73,14 +74,16 @@ class IPCPort {
     return [this.incoming, this.outgoing]
   }
 
-  static [Symbol.for('bare.attach')]([incoming, outgoing]) {
+  static [symbols.attach]([incoming, outgoing]) {
     return new this(incoming, outgoing)
   }
 }
 
-exports.open = function open(opts) {
-  const a = Pipe.pipe(opts)
-  const b = Pipe.pipe(opts)
+exports.IPCPort = IPCPort
 
-  return [new IPCPort(a[0], b[1], opts), new IPCPort(b[0], a[1], opts)]
+exports.open = function open() {
+  const a = Pipe.pipe()
+  const b = Pipe.pipe()
+
+  return [new IPCPort(a[0], b[1]), new IPCPort(b[0], a[1])]
 }
