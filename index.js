@@ -79,6 +79,8 @@ class IPCPort {
   }
 }
 
+exports.IPCPort = IPCPort
+
 exports.open = function open() {
   const a = Pipe.pipe()
   const b = Pipe.pipe()

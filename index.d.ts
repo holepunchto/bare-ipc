@@ -5,23 +5,23 @@ declare class IPC extends Duplex {
   constructor(port: IPCPort)
 }
 
-declare interface IPCPort {
+interface IPCPort extends Transferable<[incoming: number, outgoing: number]> {
   readonly incoming: number
   readonly outgoing: number
   readonly detached: boolean
 
   connect(): IPC
-
-  [symbols.detach](): [incoming: number, outgoing: number]
 }
 
-declare class IPCPort implements Transferable {
+declare class IPCPort {
   constructor(incoming: number, outgoing: number)
 
   static [symbols.attach](input: [incoming: number, outgoing: number]): IPCPort
 }
 
 declare namespace IPC {
+  export { IPCPort }
+
   export function open(): [IPCPort, IPCPort]
 }
 
