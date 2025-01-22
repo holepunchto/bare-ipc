@@ -1,19 +1,24 @@
 import { Duplex } from 'bare-stream'
+import { Transferable, symbols } from 'bare-structured-clone'
 
 declare class IPC extends Duplex {
   constructor(port: IPCPort)
 }
 
 declare interface IPCPort {
-  incoming: string | number
-  outgoing: string | number
-  detached: boolean
+  readonly incoming: number
+  readonly outgoing: number
+  readonly detached: boolean
 
   connect(): IPC
+
+  [symbols.detach](): [incoming: number, outgoing: number]
 }
 
-declare class IPCPort {
-  constructor(incoming: string | number, outgoing: string | number)
+declare class IPCPort implements Transferable {
+  constructor(incoming: number, outgoing: number)
+
+  static [symbols.attach](input: [incoming: number, outgoing: number]): IPCPort
 }
 
 declare namespace IPC {
