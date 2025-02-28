@@ -1,7 +1,12 @@
 import { Duplex } from 'bare-stream'
 import { Transferable, symbols } from 'bare-structured-clone'
 
-declare class IPC extends Duplex {
+interface IPC extends Duplex {
+  ref(): this
+  unref(): this
+}
+
+declare class IPC {
   constructor(port: IPCPort)
 }
 

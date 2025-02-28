@@ -1,6 +1,5 @@
 const Pipe = require('bare-pipe')
 const { Duplex } = require('bare-stream')
-const { symbols } = require('bare-structured-clone')
 const errors = require('./lib/errors')
 
 module.exports = exports = class IPC extends Duplex {
@@ -17,8 +16,23 @@ module.exports = exports = class IPC extends Duplex {
     this._incoming
       .on('data', this._ondata.bind(this))
       .on('end', this._onend.bind(this))
+      .pause()
 
     this._outgoing.on('drain', this._ondrain.bind(this))
+  }
+
+  ref() {
+    this._incoming.ref()
+    this._outgoing.ref()
+  }
+
+  unref() {
+    this._incoming.unref()
+    this._outgoing.unref()
+  }
+
+  _read() {
+    this._incoming.resume()
   }
 
   _write(chunk, encoding, cb) {
@@ -32,7 +46,9 @@ module.exports = exports = class IPC extends Duplex {
   }
 
   _ondata(data) {
-    this.push(data)
+    if (this.push(data) === false) {
+      this._incoming.pause()
+    }
   }
 
   _onend() {
@@ -47,7 +63,7 @@ module.exports = exports = class IPC extends Duplex {
   }
 }
 
-const IPC = exports
+const IPC = module.exports
 
 class IPCPort {
   constructor(incoming, outgoing) {
@@ -62,7 +78,7 @@ class IPCPort {
     return ipc
   }
 
-  [symbols.detach]() {
+  [Symbol.for('bare.detach')]() {
     if (this.detached) {
       throw errors.ALREADY_CONNECTED(
         'Port has already started receiving messages'
@@ -74,16 +90,14 @@ class IPCPort {
     return [this.incoming, this.outgoing]
   }
 
-  static [symbols.attach]([incoming, outgoing]) {
+  static [Symbol.for('bare.attach')]([incoming, outgoing]) {
     return new this(incoming, outgoing)
   }
 }
 
-exports.IPCPort = IPCPort
+exports.open = function open(opts) {
+  const a = Pipe.pipe(opts)
+  const b = Pipe.pipe(opts)
 
-exports.open = function open() {
-  const a = Pipe.pipe()
-  const b = Pipe.pipe()
-
-  return [new IPCPort(a[0], b[1]), new IPCPort(b[0], a[1])]
+  return [new IPCPort(a[0], b[1], opts), new IPCPort(b[0], a[1], opts)]
 }
