@@ -95,9 +95,9 @@ class IPCPort {
   }
 }
 
-exports.open = function open(opts) {
-  const a = Pipe.pipe(opts)
-  const b = Pipe.pipe(opts)
+exports.open = function open() {
+  const a = Pipe.pipe()
+  const b = Pipe.pipe()
 
-  return [new IPCPort(a[0], b[1], opts), new IPCPort(b[0], a[1], opts)]
+  return [new IPCPort(a[0], b[1]), new IPCPort(b[0], a[1])]
 }
