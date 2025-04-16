@@ -45,6 +45,11 @@ module.exports = exports = class IPC extends Duplex {
     cb(null)
   }
 
+  _predestroy() {
+    this._incoming.destroy()
+    this._outgoing.destroy()
+  }
+
   _ondata(data) {
     if (this.push(data) === false) {
       this._incoming.pause()
