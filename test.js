@@ -35,7 +35,7 @@ test('large write', (t) => {
     .on('data', (data) => received.push(data))
     .end()
 
-  b.on('close', () => t.pass('b closed'))
-    .on('data', (data) => received.push(data))
-    .end(Buffer.alloc(4 * 1024 * 1024, 'hello a'))
+  b.on('close', () => t.pass('b closed')).end(
+    Buffer.alloc(4 * 1024 * 1024, 'hello a')
+  )
 })
