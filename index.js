@@ -13,10 +13,7 @@ module.exports = exports = class IPC extends Duplex {
 
     this._pendingWrite = null
 
-    this._incoming
-      .on('data', this._ondata.bind(this))
-      .on('end', this._onend.bind(this))
-      .pause()
+    this._incoming.on('data', this._ondata.bind(this)).on('end', this._onend.bind(this)).pause()
 
     this._outgoing.on('drain', this._ondrain.bind(this))
   }
@@ -85,9 +82,7 @@ class IPCPort {
 
   [Symbol.for('bare.detach')]() {
     if (this.detached) {
-      throw errors.ALREADY_CONNECTED(
-        'Port has already started receiving messages'
-      )
+      throw errors.ALREADY_CONNECTED('Port has already started receiving messages')
     }
 
     this.detached = true
