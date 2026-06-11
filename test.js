@@ -37,3 +37,37 @@ test('large write', (t) => {
 
   b.on('close', () => t.pass('b closed')).end(Buffer.alloc(4 * 1024 * 1024, 'hello a'))
 })
+
+test('incoming pipe error is propagated', (t) => {
+  t.plan(2)
+
+  const ports = IPC.open()
+
+  const a = ports[0].connect()
+  const b = ports[1].connect()
+
+  const err = new Error('incoming boom')
+
+  a.on('error', (e) => t.is(e, err, 'error propagated')).on('close', () => t.pass('a closed'))
+
+  b.on('error', () => {}).on('close', () => {})
+
+  a.incoming.destroy(err)
+})
+
+test('outgoing pipe error is propagated', (t) => {
+  t.plan(2)
+
+  const ports = IPC.open()
+
+  const a = ports[0].connect()
+  const b = ports[1].connect()
+
+  const err = new Error('outgoing boom')
+
+  a.on('error', (e) => t.is(e, err, 'error propagated')).on('close', () => t.pass('a closed'))
+
+  b.on('error', () => {}).on('close', () => {})
+
+  a.outgoing.destroy(err)
+})

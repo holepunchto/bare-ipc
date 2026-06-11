@@ -1,7 +1,11 @@
 import { Duplex } from 'bare-stream'
+import Pipe from 'bare-pipe'
 import { Transferable, symbols } from 'bare-structured-clone'
 
 interface IPC extends Duplex {
+  readonly incoming: Pipe
+  readonly outgoing: Pipe
+
   ref(): this
   unref(): this
 }

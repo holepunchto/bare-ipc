@@ -2,7 +2,7 @@ const Pipe = require('bare-pipe')
 const { Duplex } = require('bare-stream')
 const errors = require('./lib/errors')
 
-module.exports = exports = class IPC extends Duplex {
+class IPC extends Duplex {
   constructor(port) {
     const { incoming, outgoing } = port
 
@@ -13,9 +13,23 @@ module.exports = exports = class IPC extends Duplex {
 
     this._pendingWrite = null
 
-    this._incoming.on('data', this._ondata.bind(this)).on('end', this._onend.bind(this)).pause()
+    this._onerror = this._onerror.bind(this)
 
-    this._outgoing.on('drain', this._ondrain.bind(this))
+    this._incoming
+      .on('data', this._ondata.bind(this))
+      .on('end', this._onend.bind(this))
+      .on('error', this._onerror)
+      .pause()
+
+    this._outgoing.on('drain', this._ondrain.bind(this)).on('error', this._onerror)
+  }
+
+  get incoming() {
+    return this._incoming
+  }
+
+  get outgoing() {
+    return this._outgoing
   }
 
   ref() {
@@ -47,6 +61,10 @@ module.exports = exports = class IPC extends Duplex {
     this._outgoing.destroy()
   }
 
+  _onerror(err) {
+    this.destroy(err)
+  }
+
   _ondata(data) {
     if (this.push(data) === false) {
       this._incoming.pause()
@@ -65,7 +83,7 @@ module.exports = exports = class IPC extends Duplex {
   }
 }
 
-const IPC = module.exports
+module.exports = exports = IPC
 
 class IPCPort {
   constructor(incoming, outgoing) {
