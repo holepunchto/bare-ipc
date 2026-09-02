@@ -27,66 +27,7 @@ b.on('data', (data) => {
 
 ## API
 
-### `IPC`
-
-#### `const [portA, portB] = IPC.open()`
-
-Returns a pair of connected `IPCPort`s for constructing the IPC duplex stream based on `bare-pipe`. Each port is transferable and can be sent to another thread or process before being connected.
-
-#### `const ipc = new IPC(port)`
-
-Returns a duplex stream using the provided `port`. See `bare-stream`'s `Duplex` (<https://github.com/holepunchto/bare-stream>) for the duplex stream API.
-
-Errors emitted by the underlying incoming or outgoing pipes are propagated to the stream as `error` events, after which the stream is destroyed.
-
-#### `ipc.incoming`
-
-The underlying `bare-pipe` `Pipe` used for reading. Read-only.
-
-#### `ipc.outgoing`
-
-The underlying `bare-pipe` `Pipe` used for writing. Read-only.
-
-#### `ipc.ref()`
-
-Increase the reference count for the IPC to keep the event loop alive.
-
-A common pattern is to `ipc.ref()` on `Bare.on('resume')` and `ipc.unref()` on suspend like so:
-
-```js
-Bare.on('suspend', () => ipc.unref()).on('resume', () => ipc.ref())
-```
-
-#### `ipc.unref()`
-
-Decrease the reference count for the IPC to allow the event loop to exit.
-
-See `ipc.ref()` for the common pattern to keep the event loop alive.
-
-### `IPCPort`
-
-#### `const port = new IPCPort(incoming, outgoing)`
-
-Constructs a port from a pair of file handles. The arguments are:
-
-- `incoming` is the read file handle.
-- `outgoing` is the write file handle.
-
-#### `port.connect()`
-
-Returns an `IPC` connected to the `port` and marks the `port` as detached.
-
-#### `port.incoming`
-
-The read file handle. Read-only.
-
-#### `port.outgoing`
-
-The write file handle. Read-only.
-
-#### `port.detached`
-
-A boolean for whether the `port` is detached. A port becomes detached once it is connected or transferred, and a detached port cannot be transferred again.
+See the [`bare-ipc` reference](https://docs.pears.com/reference/bare/modules/bare-ipc).
 
 ## License
 
